@@ -1,0 +1,94 @@
+# CLAUDE.md - Project Guide for AI Assistants
+
+## Project Overview
+
+Name Picker Roulette is a fun web app for randomly selecting names with a Wheel of Fortune style spinning wheel. Users can paste email-style contact lists or simple names, then watch as the colorful wheel spins dramatically before landing on a winner.
+
+## Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Animation**: Framer Motion
+- **Deployment**: Vercel
+
+## Project Structure
+
+```
+/
+├── app/
+│   ├── page.tsx          # Main page with game logic
+│   ├── layout.tsx        # Root layout
+│   └── globals.css       # Global styles
+├── components/
+│   ├── NameInput.tsx     # Text input for names
+│   ├── NameList.tsx      # Editable name list
+│   ├── GameArena.tsx     # Main game arena container
+│   ├── Wheel.tsx         # Spinning wheel component (SVG-based)
+│   ├── SpinButton.tsx    # Animated spin button
+│   ├── PickedList.tsx    # History of picked names (sidebar)
+│   └── Confetti.tsx      # Celebration effect
+├── lib/
+│   └── parseNames.ts     # Name parsing utility
+├── types/
+│   └── index.ts          # TypeScript types
+```
+
+## Key Features
+
+### Name Parsing
+The `parseNames.ts` utility handles multiple formats:
+- Email format: `"LastName, FirstName /XX/EXT <email>"` → `"FirstName LastName"`
+- Simple names: `"John"` → `"John"`
+- Separator: semicolons or newlines
+- Deduplication: same names are only added once
+
+### Game Flow
+1. **Input Phase**: Enter names in textarea
+2. **List Phase**: Review and edit names (add/remove)
+3. **Game Phase**: Wheel displayed with name segments
+4. **Spin Phase**: Wheel spins with dramatic slowdown
+5. **Winner Phase**: Banner shows winner (wheel stays visible at final position)
+6. **Repeat** until all names picked
+
+### Wheel Mechanics
+- Names are randomly shuffled once at game start
+- Picked names are **removed** from the wheel (not grayed out)
+- Remaining names keep their relative order
+- Wheel rotation is calculated to land **exactly** on the predetermined winner
+- Text orientation: radial (pointing outward), flipped on left side for readability
+
+### Animation Details
+- Wheel of Fortune style spinning wheel (SVG)
+- Colorful segments for each name (15 colors that cycle)
+- Fixed golden pointer at top
+- 5-8 full rotations with cubic-bezier easing for dramatic slowdown
+- 24 decorative lights around wheel that animate during spin
+- Confetti burst on selection
+- Winner banner appears centered (wheel visible behind it)
+
+## Commands
+
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run start    # Start production server
+npm run lint     # Run ESLint
+```
+
+## Important Notes
+
+- No backend needed - all state is client-side
+- Session-only storage - refreshing clears everything
+- Desktop-optimized (works on mobile but designed for desktop)
+- No sound effects
+- Supports 2-15 names
+- Winner is determined before spin, wheel animation lands exactly on that segment
+
+## Color Palette
+
+- Background gradient: indigo → purple → pink
+- Wheel segments: 15 vibrant colors (coral, teal, yellow, pink, mint, salmon, lavender, etc.)
+- Pointer: golden yellow (#ffd700)
+- Winner banner: gradient yellow → orange → red with pulsing glow
+- Decorative lights: alternating gold and coral
