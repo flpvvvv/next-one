@@ -29,6 +29,9 @@ Visit: [https://whosnextone.vercel.app/](https://whosnextone.vercel.app/)
 
 2. **Edit List**: Remove names you don't want or add more manually (2-20 names supported — the wheel gets cramped over 20)
 
+   - Names are limited to 50 characters maximum
+   - Special characters are automatically sanitized for security
+
 3. **Start the Game**: Click "Start Game" to enter the wheel arena (the wheel order is randomized once)
 
    - Optional: toggle sound in the header (your preference is remembered)
@@ -43,9 +46,10 @@ Visit: [https://whosnextone.vercel.app/](https://whosnextone.vercel.app/)
 
 ## Tech Stack
 
-- **Next.js 14** - React framework with App Router
+- **Next.js 16** - React framework with App Router
+- **React 19** - Latest React with concurrent features
 - **TypeScript** - Type-safe code
-- **Tailwind CSS** - Utility-first styling
+- **Tailwind CSS 4** - Utility-first styling
 - **Framer Motion** - Smooth animations
 - **Vercel** - Deployment platform
 

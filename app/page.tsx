@@ -27,11 +27,19 @@ export default function Home() {
   const [shuffledOrder, setShuffledOrder] = useState<string[]>([]);
   const [soundEnabled, setSoundEnabled] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return localStorage.getItem('next-one:soundEnabled') === '1';
+    try {
+      return localStorage.getItem('next-one:soundEnabled') === '1';
+    } catch {
+      return false;
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem('next-one:soundEnabled', soundEnabled ? '1' : '0');
+    try {
+      localStorage.setItem('next-one:soundEnabled', soundEnabled ? '1' : '0');
+    } catch {
+      // Ignore: localStorage may be unavailable
+    }
   }, [soundEnabled]);
 
   const handleNamesSubmit = (parsedPeople: Person[]) => {

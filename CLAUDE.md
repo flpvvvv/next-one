@@ -6,9 +6,10 @@ Who's next? is a fun web app for randomly selecting names with a Wheel of Fortun
 
 ## Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
+- **Framework**: Next.js 16 (App Router, Turbopack)
+- **Language**: TypeScript 5
+- **UI Library**: React 19
+- **Styling**: Tailwind CSS 4
 - **Animation**: Framer Motion
 - **Deployment**: Vercel
 
@@ -29,7 +30,8 @@ Who's next? is a fun web app for randomly selecting names with a Wheel of Fortun
 │   ├── PickedList.tsx    # History of picked names (sidebar)
 │   └── Confetti.tsx      # Celebration effect
 ├── lib/
-│   └── parseNames.ts     # Name parsing utility
+│   ├── parseNames.ts     # Name parsing utility with sanitization
+│   └── sound.ts          # Audio feedback (Web Audio API)
 ├── types/
 │   └── index.ts          # TypeScript types
 ```
@@ -44,6 +46,8 @@ The `parseNames.ts` utility handles multiple formats:
 - Simple names: `"John"` → `"John"`
 - Separator: semicolons or newlines
 - Deduplication: same names are only added once
+- **Security**: HTML-unsafe characters (`<`, `>`, `"`, `'`, `&`) are stripped
+- **Length limit**: Names are truncated to 50 characters max
 
 ### Game Flow
 

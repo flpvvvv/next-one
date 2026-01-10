@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Person } from '@/types';
-import { MAX_NAMES, validateNameCount } from '@/lib/parseNames';
+import { MAX_NAMES, MAX_NAME_LENGTH, validateNameCount } from '@/lib/parseNames';
 
 interface NameListProps {
   people: Person[];
@@ -22,10 +22,18 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
   const handleAdd = () => {
     if (people.length >= MAX_NAMES) return;
 
-    if (newName.trim()) {
+    const trimmedName = newName.trim();
+    if (trimmedName) {
+      // Sanitize and limit name length
+      const sanitizedName = trimmedName
+        .replace(/[<>\"'&]/g, '')
+        .slice(0, MAX_NAME_LENGTH);
+      
+      if (sanitizedName.length === 0) return;
+      
       const newPerson: Person = {
         id: Math.random().toString(36).substring(2, 11),
-        name: newName.trim(),
+        name: sanitizedName,
         picked: false,
       };
       onUpdate([...people, newPerson]);

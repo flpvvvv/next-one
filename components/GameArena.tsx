@@ -37,7 +37,7 @@ interface GameArenaProps {
 
 export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }: GameArenaProps) {
   const [people, setPeople] = useState<Person[]>(initialPeople);
-  const [currentShuffledOrder, setCurrentShuffledOrder] = useState<string[]>(shuffledOrder);
+  const [shuffledOrderState, setShuffledOrderState] = useState<string[]>(shuffledOrder);
   const [pickedOrder, setPickedOrder] = useState<Person[]>([]);
   const [phase, setPhase] = useState<GamePhase>('playing');
   const [currentWinner, setCurrentWinner] = useState<Person | null>(null);
@@ -69,7 +69,8 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
 
     // If only one left, directly pick them
     if (remainingCount === 1) {
-      const lastPerson = people.find(p => !p.picked)!;
+      const lastPerson = people.find(p => !p.picked);
+      if (!lastPerson) return;
       setCurrentWinner(lastPerson);
       setPeople(prev => prev.map(p => p.id === lastPerson.id ? { ...p, picked: true } : p));
       setPickedOrder(prev => [...prev, lastPerson]);
@@ -120,7 +121,7 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
     const newShuffledPeople = shuffleArray(resetPeople);
     
     setPeople(resetPeople);
-    setCurrentShuffledOrder(newShuffledPeople.map(p => p.id));
+    setShuffledOrderState(newShuffledPeople.map(p => p.id));
     setPickedOrder([]);
     setPhase('playing');
     setCurrentWinner(null);
@@ -131,14 +132,16 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
     <div className="flex gap-6 w-full max-w-6xl mx-auto">
       {/* Main arena */}
       <div className="flex-1">
-        <div className="bg-whitcurrentS/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10">
+        <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10">
           {/* Wheel container */}
           <div className="flex flex-col items-center">
             <div className="relative mb-6">
               <Wheel
                 ref={wheelRef}
                 people={people}
-                shuffledOrder={shuffledOrder}                soundEnabled={soundEnabled}                onSpinEnd={handleSpinEnd}
+                shuffledOrder={shuffledOrderState}
+                soundEnabled={soundEnabled}
+                onSpinEnd={handleSpinEnd}
                 includePickedPersonId={phase === 'winner' && currentWinner ? currentWinner.id : undefined}
                 highlightedPersonId={phase === 'winner' && currentWinner ? currentWinner.id : undefined}
               />

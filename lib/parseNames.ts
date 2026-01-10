@@ -2,6 +2,18 @@ import { Person } from '@/types';
 
 export const MIN_NAMES = 2;
 export const MAX_NAMES = 20;
+export const MAX_NAME_LENGTH = 50;
+
+/**
+ * Sanitize a name by removing potentially dangerous characters
+ * and limiting length
+ */
+function sanitizeName(name: string): string {
+  return name
+    .replace(/[<>"'&]/g, '') // Remove HTML-unsafe characters
+    .trim()
+    .slice(0, MAX_NAME_LENGTH);
+}
 
 /**
  * Parse a string of names in various formats and extract clean names.
@@ -27,8 +39,9 @@ export function parseNames(input: string): Person[] {
   const seenNames = new Set<string>();
 
   for (const entry of entries) {
-    const name = extractName(entry);
-    if (name && !seenNames.has(name.toLowerCase())) {
+    const rawName = extractName(entry);
+    const name = rawName ? sanitizeName(rawName) : null;
+    if (name && name.length > 0 && !seenNames.has(name.toLowerCase())) {
       seenNames.add(name.toLowerCase());
       people.push({
         id: generateId(),
