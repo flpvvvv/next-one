@@ -129,10 +129,10 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
   };
 
   return (
-    <div className="flex gap-6 w-full max-w-6xl mx-auto">
+    <div className="flex flex-col lg:flex-row gap-4 md:gap-6 w-full max-w-6xl mx-auto">
       {/* Main arena */}
-      <div className="flex-1">
-        <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10">
+      <div className="flex-1 min-w-0">
+        <div className="bg-white/5 backdrop-blur-lg rounded-2xl md:rounded-3xl p-4 md:p-8 border border-white/10">
           {/* Wheel container */}
           <div className="flex flex-col items-center">
             <div className="relative mb-6">
@@ -171,7 +171,7 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
       </div>
 
       {/* Sidebar */}
-      <div className="w-64">
+      <div className="w-full lg:w-64">
         <PickedList
           pickedOrder={pickedOrder}
           remaining={remainingCount}
@@ -195,9 +195,9 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
               initial={{ scale: 0.5, y: 50 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full mx-auto"
+              className="bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full mx-4 md:mx-auto"
             >
-              <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-8 text-center text-white relative overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4 md:p-8 text-center text-white relative overflow-hidden">
                 {/* Background animated circles */}
                 <motion.div
                   animate={{
@@ -220,13 +220,13 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: "spring", bounce: 0.5 }}
-                  className="text-8xl mb-4"
+                  className="text-5xl md:text-8xl mb-2 md:mb-4"
                 >
                   🎉
                 </motion.div>
                 
-                <h2 className="text-3xl font-bold opacity-90 mb-2">The Winner is</h2>
-                <h1 className="text-6xl font-black mb-4 drop-shadow-md break-words">
+                <h2 className="text-xl md:text-3xl font-bold opacity-90 mb-1 md:mb-2">The Winner is</h2>
+                <h1 className="text-3xl md:text-6xl font-black mb-2 md:mb-4 drop-shadow-md break-words">
                   {currentWinner.name}
                 </h1>
                 
@@ -235,8 +235,8 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
                 </div>
               </div>
 
-              <div className="p-8 bg-gray-50 flex flex-col gap-4">
-                <p className="text-center text-gray-500 text-lg">
+              <div className="p-4 md:p-8 bg-gray-50 flex flex-col gap-3 md:gap-4">
+                <p className="text-center text-gray-500 text-sm md:text-lg">
                   {remainingCount > 0 
                     ? `${remainingCount} ${remainingCount === 1 ? 'person' : 'people'} left in the list.` 
                     : "That was the last one!"}
@@ -248,8 +248,8 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
                     whileTap={{ scale: 0.95 }}
                     onClick={handleNextRound}
                     autoFocus
-                    className="w-full max-w-sm py-4 bg-gradient-to-r from-green-500 to-emerald-600
-                               text-white text-2xl font-bold rounded-xl shadow-xl hover:shadow-2xl
+                    className="w-full max-w-sm py-3 md:py-4 bg-gradient-to-r from-green-500 to-emerald-600
+                               text-white text-lg md:text-2xl font-bold rounded-xl shadow-xl hover:shadow-2xl
                                transition-all transform hover:-translate-y-1"
                   >
                     {remainingCount > 0 ? "Next Round →" : "See Final Results 🏆"}
@@ -273,7 +273,7 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-3xl p-12 text-center max-w-2xl w-full relative overflow-hidden flex flex-col max-h-[85vh]"
+              className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-2xl md:rounded-3xl p-6 md:p-12 text-center max-w-2xl w-full mx-4 md:mx-auto relative overflow-hidden flex flex-col max-h-[85vh]"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 pointer-events-none" />
               
@@ -283,7 +283,7 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="text-7xl mb-4"
+                    className="text-5xl md:text-7xl mb-2 md:mb-4"
                   >
                     🏆
                   </motion.div>
@@ -292,7 +292,7 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-300 to-red-300 mb-6"
+                    className="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-300 to-red-300 mb-4 md:mb-6"
                   >
                     All Done!
                   </motion.h2>

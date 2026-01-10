@@ -78,19 +78,20 @@ export default function Home() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 py-6 px-8">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <header className="relative z-10 py-4 px-4 md:py-6 md:px-8">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-black text-white flex items-center gap-3"
+            className="text-xl md:text-3xl font-black text-white flex items-center gap-2 md:gap-3"
           >
-            <Image src="/logo.svg" alt="Who’s next?" width={40} height={40} className="w-10 h-10" />
-            Who’s next?
+            <Image src="/logo.svg" alt="Who's next?" width={40} height={40} className="w-8 h-8 md:w-10 md:h-10" />
+            <span className="hidden sm:inline">Who's next?</span>
+            <span className="sm:hidden">Next?</span>
           </motion.h1>
 
           {phase !== 'input' && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -104,11 +105,12 @@ export default function Home() {
                   }
                 }}
                 aria-pressed={soundEnabled}
-                className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg
-                           text-white text-sm font-medium transition-colors"
+                className="px-2 py-1.5 md:px-3 md:py-2 bg-white/10 hover:bg-white/20 rounded-lg
+                           text-white text-xs md:text-sm font-medium transition-colors"
                 title={soundEnabled ? 'Sound on' : 'Sound off'}
               >
-                {soundEnabled ? '🔊 Sound' : '🔇 Sound'}
+                <span className="hidden sm:inline">{soundEnabled ? '🔊 Sound' : '🔇 Sound'}</span>
+                <span className="sm:hidden">{soundEnabled ? '🔊' : '🔇'}</span>
               </motion.button>
 
               <motion.button
@@ -117,10 +119,11 @@ export default function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleNewGame}
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg
-                           text-white text-sm font-medium transition-colors"
+                className="px-2 py-1.5 md:px-4 md:py-2 bg-white/10 hover:bg-white/20 rounded-lg
+                           text-white text-xs md:text-sm font-medium transition-colors"
               >
-                🆕 New Game
+                <span className="hidden sm:inline">🆕 New Game</span>
+                <span className="sm:hidden">🆕</span>
               </motion.button>
             </div>
           )}
@@ -128,7 +131,7 @@ export default function Home() {
       </header>
 
       {/* Main content */}
-      <main className="relative z-10 px-8 py-8">
+      <main className="relative z-10 px-4 py-4 md:px-8 md:py-8">
         <AnimatePresence mode="wait">
           {phase === 'input' && (
             <motion.div

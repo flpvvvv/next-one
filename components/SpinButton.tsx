@@ -15,7 +15,7 @@ export default function SpinButton({ onClick, disabled, isSpinning }: SpinButton
       whileTap={!disabled && !isSpinning ? { scale: 0.95 } : {}}
       onClick={onClick}
       disabled={disabled || isSpinning}
-      className={`relative px-12 py-6 rounded-2xl font-black text-3xl text-white
+      className={`relative px-8 py-4 md:px-12 md:py-6 rounded-xl md:rounded-2xl font-black text-xl md:text-3xl text-white
                   shadow-2xl overflow-hidden
                   ${isSpinning
                     ? 'bg-gradient-to-r from-gray-600 to-gray-700 cursor-wait'
@@ -47,7 +47,7 @@ export default function SpinButton({ onClick, disabled, isSpinning }: SpinButton
           </>
         ) : (
           <>
-            <span className="text-4xl">🎰</span>
+            <span className="text-2xl md:text-4xl">🎰</span>
             SPIN!
           </>
         )}

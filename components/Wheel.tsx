@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useImperativeHandle, useState, useCallback, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useState, useCallback, useRef, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Person } from '@/types';
 import { playTick } from '@/lib/sound';
@@ -42,8 +42,26 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(
   ({ people, shuffledOrder, soundEnabled, onSpinEnd, includePickedPersonId, highlightedPersonId }, ref) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
+  const [wheelSize, setWheelSize] = useState(420);
   const lastTickRef = useRef<number>(0);
   const controls = useAnimation();
+
+  // Responsive wheel size
+  useEffect(() => {
+    const updateSize = () => {
+      const width = window.innerWidth;
+      if (width < 480) {
+        setWheelSize(Math.min(300, width - 64));
+      } else if (width < 768) {
+        setWheelSize(360);
+      } else {
+        setWheelSize(420);
+      }
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
 
   // Get active (not picked) people in shuffled order
   const order = shuffledOrder.length > 0 ? shuffledOrder : people.map(p => p.id);
@@ -177,7 +195,6 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(
     return { x, y, rotation: textRotation };
   };
 
-  const wheelSize = 420;
   const radius = wheelSize / 2;
 
   // Show message if no active people
@@ -195,7 +212,7 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(
   return (
     <div className="relative">
       {/* Pointer (fixed at top) */}
-      <div className="absolute left-1/2 -top-2 -translate-x-1/2 z-20">
+      <div className="absolute left-1/2 -top-1 md:-top-2 -translate-x-1/2 z-20">
         <motion.div
           animate={
             isSpinning
@@ -219,7 +236,7 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(
               ? { duration: 0.12, repeat: Infinity, repeatType: 'mirror' }
               : { duration: 0.2 }
           }
-          className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[40px]
+          className="w-0 h-0 border-l-[14px] border-r-[14px] border-t-[28px] md:border-l-[20px] md:border-r-[20px] md:border-t-[40px]
                      border-l-transparent border-r-transparent border-t-yellow-400"
         />
       </div>

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Who's next? is a fun web app for randomly selecting names with a Wheel of Fortune style spinning wheel. Users can paste email-style contact lists or simple names, then watch as the colorful wheel spins dramatically before landing on a winner.
+Who's next? is a fun, fully responsive web app for randomly selecting names with a Wheel of Fortune style spinning wheel. Users can paste email-style contact lists or simple names, then watch as the colorful wheel spins dramatically before landing on a winner. The app works seamlessly on both desktop and mobile devices with adaptive layouts and touch-optimized controls.
 
 ## Tech Stack
 
@@ -66,6 +66,25 @@ The `parseNames.ts` utility handles multiple formats:
 - Wheel rotation is calculated to land **exactly** on the predetermined winner
 - **Audio**: Tick sounds triggered at segment boundaries during spin
 - Text orientation: radial (pointing outward), flipped on left side for readability
+- **Responsive sizing**: Wheel automatically adjusts size based on viewport width
+
+### Responsive Design
+
+- **Breakpoints**: Mobile-first approach using Tailwind's `md:` (768px) and `lg:` (1024px) breakpoints
+- **Layouts**:
+  - Mobile: Stacked vertical layout (wheel on top, picked list below)
+  - Desktop: Side-by-side layout (wheel on left, picked list on right)
+- **Typography**: All text sizes scale down on mobile (e.g., `text-xl md:text-3xl`)
+- **Spacing**: Reduced padding and gaps on mobile devices
+- **Touch UX**:
+  - Minimum 16px font size on inputs to prevent iOS zoom
+  - Tap highlight colors disabled for better UX
+  - Always-visible delete buttons on mobile (hover-only on desktop)
+- **Wheel sizing**:
+  - Mobile (<480px): 300px or viewport width - 64px
+  - Tablet (480-768px): 360px
+  - Desktop: 420px
+- **Header**: Compact buttons with icon-only mode on small screens
 
 ### Animation Details
 
@@ -90,7 +109,12 @@ npm run lint     # Run ESLint
 
 - No backend needed - all state is client-side
 - Game state is session-only (refreshing clears the current round), but the sound toggle is persisted in localStorage
-- Desktop-optimized (works on mobile but designed for desktop)
+- Fully responsive design with mobile-first considerations:
+  - Dynamic wheel sizing (300px on small phones, 360px on tablets, 420px on desktop)
+  - Stacked layout on mobile, side-by-side on desktop
+  - Touch-optimized controls with always-visible delete buttons on mobile
+  - Responsive typography and spacing throughout
+  - Safe area support for notched devices
 - Optional sound effects (toggle, default off)
 - Supports 2-20 names
 - Winner is determined before spin, wheel animation lands exactly on that segment
