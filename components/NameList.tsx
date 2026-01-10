@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Person } from '@/types';
-import { validateNameCount } from '@/lib/parseNames';
+import { MAX_NAMES, validateNameCount } from '@/lib/parseNames';
 
 interface NameListProps {
   people: Person[];
@@ -20,6 +20,8 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
   };
 
   const handleAdd = () => {
+    if (people.length >= MAX_NAMES) return;
+
     if (newName.trim()) {
       const newPerson: Person = {
         id: Math.random().toString(36).substring(2, 11),
@@ -38,6 +40,7 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
   };
 
   const validation = validateNameCount(people.length);
+  const atMax = people.length >= MAX_NAMES;
 
   return (
     <motion.div
@@ -82,7 +85,7 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleAdd}
-            disabled={!newName.trim()}
+            disabled={!newName.trim() || atMax}
             className="px-4 py-2 bg-teal-500 rounded-xl font-bold text-white
                        disabled:opacity-50 disabled:cursor-not-allowed
                        transition-all duration-200"
@@ -134,6 +137,16 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
             className="text-amber-400 text-sm mb-4"
           >
             ⚠️ {validation.message}
+          </motion.p>
+        )}
+
+        {atMax && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-white/50 text-xs -mt-2 mb-4"
+          >
+            You’ve reached the max of {MAX_NAMES} names.
           </motion.p>
         )}
 

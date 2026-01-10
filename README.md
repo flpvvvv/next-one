@@ -7,6 +7,7 @@ A fun, interactive web app for randomly picking names with a Wheel of Fortune st
 - **Smart Name Parsing**: Paste email-style contact lists or simple names - the app intelligently extracts names
 - **Wheel of Fortune Style**: Colorful spinning wheel with segments for each name
 - **Dramatic Spin Animation**: 5-8 full rotations with realistic slowdown - the wheel always lands exactly on the announced winner
+- **Optional Sound**: A small jackpot sting you can toggle on/off
 - **Pick History**: Track who's been picked in order on the sidebar
 - **Progressive Elimination**: Picked names are removed from the wheel (remaining names keep their order)
 - **Easy Controls**: Restart the round or start completely fresh
@@ -23,9 +24,11 @@ Visit: [https://next-one.vercel.app/](https://next-one.vercel.app/)
    - Simple format: `John Doe` or just `John`
    - Separate multiple names with semicolons or newlines
 
-2. **Edit List**: Remove names you don't want or add more manually (2-15 names supported)
+2. **Edit List**: Remove names you don't want or add more manually (2-20 names supported — the wheel gets cramped over 20)
 
 3. **Start the Game**: Click "Start Game" to enter the wheel arena
+
+   - Optional: toggle sound in the header (your preference is remembered)
 
 4. **Spin!**: Click the big SPIN button to start the wheel
 

@@ -1,18 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Person } from '@/types';
 import NameInput from '@/components/NameInput';
 import NameList from '@/components/NameList';
 import GameArena from '@/components/GameArena';
+import { primeSound } from '@/lib/sound';
 
 type AppPhase = 'input' | 'list' | 'game';
+
+// Shuffle array randomly (Fisher-Yates). Called only from user events.
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 export default function Home() {
   const [phase, setPhase] = useState<AppPhase>('input');
   const [people, setPeople] = useState<Person[]>([]);
+  const [shuffledOrder, setShuffledOrder] = useState<string[]>([]);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('next-one:soundEnabled') === '1';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('next-one:soundEnabled', soundEnabled ? '1' : '0');
+  }, [soundEnabled]);
 
   const handleNamesSubmit = (parsedPeople: Person[]) => {
     setPeople(parsedPeople);
@@ -24,6 +44,7 @@ export default function Home() {
   };
 
   const handleStartGame = () => {
+    setShuffledOrder(shuffleArray(people.map(p => p.id)));
     setPhase('game');
   };
 
@@ -33,6 +54,7 @@ export default function Home() {
 
   const handleNewGame = () => {
     setPeople([]);
+    setShuffledOrder([]);
     setPhase('input');
   };
 
@@ -58,17 +80,39 @@ export default function Home() {
           </motion.h1>
 
           {phase !== 'input' && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleNewGame}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg
-                         text-white text-sm font-medium transition-colors"
-            >
-              🆕 New Game
-            </motion.button>
+            <div className="flex items-center gap-3">
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={async () => {
+                  const next = !soundEnabled;
+                  setSoundEnabled(next);
+                  if (next) {
+                    await primeSound();
+                  }
+                }}
+                aria-pressed={soundEnabled}
+                className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg
+                           text-white text-sm font-medium transition-colors"
+                title={soundEnabled ? 'Sound on' : 'Sound off'}
+              >
+                {soundEnabled ? '🔊 Sound' : '🔇 Sound'}
+              </motion.button>
+
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleNewGame}
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg
+                           text-white text-sm font-medium transition-colors"
+              >
+                🆕 New Game
+              </motion.button>
+            </div>
           )}
         </div>
       </header>
@@ -115,7 +159,9 @@ export default function Home() {
             >
               <GameArena
                 initialPeople={people}
+                shuffledOrder={shuffledOrder}
                 onNewGame={handleNewGame}
+                soundEnabled={soundEnabled}
               />
             </motion.div>
           )}

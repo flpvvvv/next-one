@@ -1,5 +1,8 @@
 import { Person } from '@/types';
 
+export const MIN_NAMES = 2;
+export const MAX_NAMES = 20;
+
 /**
  * Parse a string of names in various formats and extract clean names.
  *
@@ -84,14 +87,14 @@ function generateId(): string {
 }
 
 /**
- * Validate that we have a valid number of names (2-15)
+ * Validate that we have a valid number of names.
  */
 export function validateNameCount(count: number): { valid: boolean; message: string } {
-  if (count < 2) {
-    return { valid: false, message: 'Please enter at least 2 names to start the game.' };
+  if (count < MIN_NAMES) {
+    return { valid: false, message: `Please enter at least ${MIN_NAMES} names to start the game.` };
   }
-  if (count > 15) {
-    return { valid: false, message: 'Maximum 15 names allowed. Please remove some names.' };
+  if (count > MAX_NAMES) {
+    return { valid: false, message: `Wheel gets cramped over ${MAX_NAMES} names. Please remove some.` };
   }
   return { valid: true, message: '' };
 }

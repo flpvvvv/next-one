@@ -41,12 +41,10 @@ async function main() {
   const icoBuffer = await pngToIco(pngBuffers);
   await fs.writeFile(outIcoPath, icoBuffer);
 
-  // eslint-disable-next-line no-console
   console.log(`Wrote ${path.relative(projectRoot, outIcoPath)} (${icoBuffer.length} bytes)`);
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
   console.error(err);
   process.exitCode = 1;
 });

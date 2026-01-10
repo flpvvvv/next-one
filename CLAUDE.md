@@ -67,7 +67,7 @@ The `parseNames.ts` utility handles multiple formats:
 - Wheel of Fortune style spinning wheel (SVG)
 - Colorful segments for each name (15 colors that cycle)
 - Fixed golden pointer at top
-- 5-8 full rotations with cubic-bezier easing for dramatic slowdown
+- 6-10 full rotations with harder slowdown + a tiny settle at the end
 - 24 decorative lights around wheel that animate during spin
 - Confetti burst on selection
 - Winner banner appears centered (wheel visible behind it)
@@ -84,10 +84,10 @@ npm run lint     # Run ESLint
 ## Important Notes
 
 - No backend needed - all state is client-side
-- Session-only storage - refreshing clears everything
+- Game state is session-only (refreshing clears the current round), but the sound toggle is persisted in localStorage
 - Desktop-optimized (works on mobile but designed for desktop)
-- No sound effects
-- Supports 2-15 names
+- Optional sound effects (toggle, default off)
+- Supports 2-20 names
 - Winner is determined before spin, wheel animation lands exactly on that segment
 
 ## Color Palette

@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useImperativeHandle, useState, useCallback, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useState, useCallback } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Person } from '@/types';
 
@@ -25,7 +25,10 @@ const SEGMENT_COLORS = [
 
 interface WheelProps {
   people: Person[];
+  shuffledOrder: string[];
   onSpinEnd: (winner: Person) => void;
+  includePickedPersonId?: string;
+  highlightedPersonId?: string;
 }
 
 export interface WheelHandle {
@@ -33,34 +36,20 @@ export interface WheelHandle {
   isSpinning: boolean;
 }
 
-// Shuffle array randomly (Fisher-Yates)
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
-const Wheel = forwardRef<WheelHandle, WheelProps>(({ people, onSpinEnd }, ref) => {
+const Wheel = forwardRef<WheelHandle, WheelProps>(
+  ({ people, shuffledOrder, onSpinEnd, includePickedPersonId, highlightedPersonId }, ref) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const [shuffledOrder, setShuffledOrder] = useState<string[]>([]);
   const controls = useAnimation();
 
-  // Initialize shuffled order once when component mounts or people change completely
-  useEffect(() => {
-    if (shuffledOrder.length === 0 || !people.some(p => shuffledOrder.includes(p.id))) {
-      // Initial shuffle - create random order of IDs
-      setShuffledOrder(shuffleArray(people.map(p => p.id)));
-    }
-  }, [people, shuffledOrder]);
-
   // Get active (not picked) people in shuffled order
-  const activePeople = shuffledOrder
+  const order = shuffledOrder.length > 0 ? shuffledOrder : people.map(p => p.id);
+
+  const activePeople = order
     .map(id => people.find(p => p.id === id))
-    .filter((p): p is Person => p !== undefined && !p.picked);
+    .filter((p): p is Person =>
+      p !== undefined && (!p.picked || p.id === includePickedPersonId)
+    );
 
   const segmentAngle = activePeople.length > 0 ? 360 / activePeople.length : 360;
 
@@ -87,8 +76,8 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ people, onSpinEnd }, ref) =
 
     const targetRotation = 360 - (winnerIndex + 0.5) * segmentAngle;
 
-    // Add multiple full rotations for excitement (5-8 full spins)
-    const fullRotations = 5 + Math.floor(Math.random() * 4);
+    // Add multiple full rotations for excitement (casino style)
+    const fullRotations = 6 + Math.floor(Math.random() * 5);
 
     // Small random offset within the segment for variety (stays within segment bounds)
     const offsetWithinSegment = (Math.random() - 0.5) * (segmentAngle * 0.5);
@@ -107,9 +96,23 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ people, onSpinEnd }, ref) =
     await controls.start({
       rotate: totalRotation,
       transition: {
-        duration: 4 + Math.random() * 2, // 4-6 seconds
-        ease: [0.15, 0.85, 0.25, 1], // Custom easing: fast start, very dramatic slowdown
+        duration: 5 + Math.random() * 2, // 5-7 seconds
+        ease: [0.12, 0.92, 0.22, 1], // Faster start + harder slowdown
       },
+    });
+
+    // Tiny settle to make the stop feel more physical (stays well within segment bounds)
+    await controls.start({
+      rotate: totalRotation + 1.2,
+      transition: { duration: 0.12, ease: 'easeOut' },
+    });
+    await controls.start({
+      rotate: totalRotation - 0.8,
+      transition: { duration: 0.12, ease: 'easeInOut' },
+    });
+    await controls.start({
+      rotate: totalRotation,
+      transition: { duration: 0.1, ease: 'easeOut' },
     });
 
     setRotation(totalRotation);
@@ -177,10 +180,31 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ people, onSpinEnd }, ref) =
     <div className="relative">
       {/* Pointer (fixed at top) */}
       <div className="absolute left-1/2 -top-2 -translate-x-1/2 z-20">
-        <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[40px]
-                        border-l-transparent border-r-transparent border-t-yellow-400
-                        drop-shadow-lg"
-             style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))' }}
+        <motion.div
+          animate={
+            isSpinning
+              ? {
+                  y: [0, -3, 0],
+                  rotate: [0, -6, 6, 0],
+                  filter: [
+                    'drop-shadow(0 4px 8px rgba(0,0,0,0.4))',
+                    'drop-shadow(0 0 16px rgba(255, 215, 0, 0.9))',
+                    'drop-shadow(0 4px 8px rgba(0,0,0,0.4))',
+                  ],
+                }
+              : {
+                  y: 0,
+                  rotate: 0,
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))',
+                }
+          }
+          transition={
+            isSpinning
+              ? { duration: 0.12, repeat: Infinity, repeatType: 'mirror' }
+              : { duration: 0.2 }
+          }
+          className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[40px]
+                     border-l-transparent border-r-transparent border-t-yellow-400"
         />
       </div>
 
@@ -222,6 +246,9 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ people, onSpinEnd }, ref) =
                 ? person.name.substring(0, 13) + '…'
                 : person.name;
 
+              const isHighlighted = highlightedPersonId === person.id;
+              const dimOthers = Boolean(highlightedPersonId) && !isHighlighted;
+
               return (
                 <g key={person.id}>
                   {/* Segment */}
@@ -229,7 +256,16 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ people, onSpinEnd }, ref) =
                     d={createSegmentPath(index, activePeople.length, radius)}
                     fill={color}
                     stroke="#fff"
-                    strokeWidth="3"
+                    strokeWidth={isHighlighted ? '5' : '3'}
+                    opacity={dimOthers ? 0.55 : 1}
+                    style={
+                      isHighlighted
+                        ? {
+                            filter:
+                              'drop-shadow(0 0 10px rgba(255, 215, 0, 0.85)) drop-shadow(0 0 22px rgba(255, 80, 0, 0.55))',
+                          }
+                        : undefined
+                    }
                   />
                   {/* Text - radial orientation */}
                   <text
@@ -244,6 +280,7 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ people, onSpinEnd }, ref) =
                     className="pointer-events-none select-none"
                     style={{
                       textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+                      opacity: dimOthers ? 0.6 : 1,
                     }}
                   >
                     {displayName}
@@ -294,15 +331,24 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ people, onSpinEnd }, ref) =
                   backgroundColor: i % 2 === 0 ? '#ffd700' : '#ff6b6b',
                   boxShadow: `0 0 8px ${i % 2 === 0 ? '#ffd700' : '#ff6b6b'}`,
                 }}
-                animate={{
-                  opacity: isSpinning ? [0.5, 1, 0.5] : 0.7,
-                  scale: isSpinning ? [1, 1.3, 1] : 1,
-                }}
-                transition={{
-                  duration: 0.2,
-                  repeat: isSpinning ? Infinity : 0,
-                  delay: i * 0.03,
-                }}
+                animate={
+                  isSpinning
+                    ? {
+                        opacity: [0.15, 1, 0.15],
+                        scale: [0.9, 1.7, 0.9],
+                      }
+                    : { opacity: 0.75, scale: 1 }
+                }
+                transition={
+                  isSpinning
+                    ? {
+                        duration: 0.35,
+                        repeat: Infinity,
+                        ease: 'linear',
+                        delay: i * 0.02,
+                      }
+                    : { duration: 0.2 }
+                }
               />
             );
           })}

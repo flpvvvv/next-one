@@ -1,31 +1,58 @@
 'use client';
 
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Person, GamePhase } from '@/types';
 import Wheel, { WheelHandle } from './Wheel';
 import SpinButton from './SpinButton';
 import PickedList from './PickedList';
 import Confetti from './Confetti';
+import { playJackpotSting } from '@/lib/sound';
+
+function hashStringToSeed(input: string): number {
+  // FNV-1a 32-bit
+  let hash = 2166136261;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
 
 interface GameArenaProps {
   initialPeople: Person[];
+  shuffledOrder: string[];
   onNewGame: () => void;
+  soundEnabled: boolean;
 }
 
-export default function GameArena({ initialPeople, onNewGame }: GameArenaProps) {
+export default function GameArena({ initialPeople, shuffledOrder, onNewGame, soundEnabled }: GameArenaProps) {
   const [people, setPeople] = useState<Person[]>(initialPeople);
   const [pickedOrder, setPickedOrder] = useState<Person[]>([]);
   const [phase, setPhase] = useState<GamePhase>('playing');
   const [currentWinner, setCurrentWinner] = useState<Person | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const wheelRef = useRef<WheelHandle>(null);
+  const confettiTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (confettiTimeoutRef.current !== null) {
+        window.clearTimeout(confettiTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Get remaining (not picked) people
   const remainingCount = useMemo(
     () => people.filter(p => !p.picked).length,
     [people]
   );
+
+  const confettiSeed = useMemo(() => {
+    if (!currentWinner) return pickedOrder.length;
+    return (hashStringToSeed(currentWinner.id) + pickedOrder.length * 101) >>> 0;
+  }, [currentWinner, pickedOrder.length]);
 
   const handleSpin = useCallback(() => {
     if (remainingCount === 0 || phase !== 'playing') return;
@@ -38,13 +65,18 @@ export default function GameArena({ initialPeople, onNewGame }: GameArenaProps) 
       setPickedOrder(prev => [...prev, lastPerson]);
       setPhase('winner');
       setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
+      if (confettiTimeoutRef.current !== null) window.clearTimeout(confettiTimeoutRef.current);
+      confettiTimeoutRef.current = window.setTimeout(() => setShowConfetti(false), 3000);
+
+      if (soundEnabled) {
+        void playJackpotSting();
+      }
       return;
     }
 
     setPhase('spinning');
     wheelRef.current?.spin();
-  }, [remainingCount, phase, people]);
+  }, [remainingCount, phase, people, soundEnabled]);
 
   const handleSpinEnd = useCallback((winner: Person) => {
     setCurrentWinner(winner);
@@ -52,8 +84,13 @@ export default function GameArena({ initialPeople, onNewGame }: GameArenaProps) 
     setPickedOrder(prev => [...prev, winner]);
     setPhase('winner');
     setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 2500);
-  }, []);
+    if (confettiTimeoutRef.current !== null) window.clearTimeout(confettiTimeoutRef.current);
+    confettiTimeoutRef.current = window.setTimeout(() => setShowConfetti(false), 2500);
+
+    if (soundEnabled) {
+      void playJackpotSting();
+    }
+  }, [soundEnabled]);
 
   const handleNextRound = () => {
     setCurrentWinner(null);
@@ -82,10 +119,12 @@ export default function GameArena({ initialPeople, onNewGame }: GameArenaProps) 
           <div className="flex flex-col items-center">
             <div className="relative mb-6">
               <Wheel
-                key={remainingCount} // Reset wheel rotation when segments change
                 ref={wheelRef}
                 people={people}
+                shuffledOrder={shuffledOrder}
                 onSpinEnd={handleSpinEnd}
+                includePickedPersonId={phase === 'winner' && currentWinner ? currentWinner.id : undefined}
+                highlightedPersonId={phase === 'winner' && currentWinner ? currentWinner.id : undefined}
               />
 
               {/* Winner banner - centered on wheel but transparent background */}
@@ -101,22 +140,37 @@ export default function GameArena({ initialPeople, onNewGame }: GameArenaProps) 
                       initial={{ y: 30, boxShadow: '0 0 40px rgba(255, 200, 0, 0.6)' }}
                       animate={{
                         y: 0,
+                        scale: [1, 1.06, 1],
                         boxShadow: [
                           '0 0 40px rgba(255, 200, 0, 0.6)',
-                          '0 0 70px rgba(255, 200, 0, 0.9)',
+                          '0 0 90px rgba(255, 200, 0, 1)',
                           '0 0 40px rgba(255, 200, 0, 0.6)',
                         ],
                       }}
-                      transition={{ duration: 1, repeat: Infinity }}
+                      transition={{ duration: 0.85, repeat: Infinity, repeatDelay: 0.15 }}
                       className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500
-                                 px-8 py-5 rounded-2xl shadow-2xl text-center pointer-events-auto"
+                                 px-8 py-5 rounded-2xl shadow-2xl text-center pointer-events-auto
+                                 relative overflow-hidden"
                     >
+                      {/* One-shot jackpot flash (runs once on mount) */}
                       <motion.div
-                        animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: [0, 1, 0], scale: [0.9, 1.08, 1] }}
+                        transition={{ duration: 0.38, times: [0, 0.35, 1], ease: 'easeOut' }}
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            'radial-gradient(circle at 50% 35%, rgba(255,255,255,0.95), rgba(255,255,255,0) 60%)',
+                          mixBlendMode: 'overlay',
+                        }}
+                      />
+
+                      <motion.div
+                        animate={{ rotate: [0, -12, 12, -12, 12, 0], scale: [1, 1.1, 1] }}
+                        transition={{ duration: 0.55, delay: 0.15 }}
                         className="text-5xl mb-2"
                       >
-                        🎉
+                        🎰
                       </motion.div>
                       <h2 className="text-2xl font-black text-white mb-1">WINNER!</h2>
                       <p className="text-xl font-bold text-white/90">{currentWinner.name}</p>
@@ -208,7 +262,7 @@ export default function GameArena({ initialPeople, onNewGame }: GameArenaProps) 
       </div>
 
       {/* Confetti */}
-      <Confetti active={showConfetti} />
+      <Confetti active={showConfetti} seed={confettiSeed} />
     </div>
   );
 }
