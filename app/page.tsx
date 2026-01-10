@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Person } from '@/types';
 import NameInput from '@/components/NameInput';
@@ -52,8 +53,8 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl font-black text-white flex items-center gap-3"
           >
-            <span className="text-4xl">🎲</span>
-            Name Picker Roulette
+            <Image src="/logo.svg" alt="Who’s next?" width={40} height={40} className="w-10 h-10" />
+            Who’s next?
           </motion.h1>
 
           {phase !== 'input' && (
