@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Name Picker Roulette is a fun web app for randomly selecting names with a Wheel of Fortune style spinning wheel. Users can paste email-style contact lists or simple names, then watch as the colorful wheel spins dramatically before landing on a winner.
+Who's next? is a fun web app for randomly selecting names with a Wheel of Fortune style spinning wheel. Users can paste email-style contact lists or simple names, then watch as the colorful wheel spins dramatically before landing on a winner.
 
 ## Tech Stack
 
@@ -37,13 +37,16 @@ Name Picker Roulette is a fun web app for randomly selecting names with a Wheel 
 ## Key Features
 
 ### Name Parsing
+
 The `parseNames.ts` utility handles multiple formats:
+
 - Email format: `"LastName, FirstName /XX/EXT <email>"` → `"FirstName LastName"`
 - Simple names: `"John"` → `"John"`
 - Separator: semicolons or newlines
 - Deduplication: same names are only added once
 
 ### Game Flow
+
 1. **Input Phase**: Enter names in textarea
 2. **List Phase**: Review and edit names (add/remove)
 3. **Game Phase**: Wheel displayed with name segments
@@ -52,6 +55,7 @@ The `parseNames.ts` utility handles multiple formats:
 6. **Repeat** until all names picked
 
 ### Wheel Mechanics
+
 - Names are randomly shuffled once at game start
 - Picked names are **removed** from the wheel (not grayed out)
 - Remaining names keep their relative order
@@ -59,6 +63,7 @@ The `parseNames.ts` utility handles multiple formats:
 - Text orientation: radial (pointing outward), flipped on left side for readability
 
 ### Animation Details
+
 - Wheel of Fortune style spinning wheel (SVG)
 - Colorful segments for each name (15 colors that cycle)
 - Fixed golden pointer at top

@@ -1,4 +1,4 @@
-# Name Picker Roulette 🎡
+# Who's next? 🎡
 
 A fun, interactive web app for randomly picking names with a Wheel of Fortune style spinning wheel. Perfect for team meetings, raffles, or any situation where you need to pick names fairly and entertainingly!
 
@@ -18,6 +18,7 @@ Visit: [https://next-one.vercel.app/](https://next-one.vercel.app/)
 ## How to Use
 
 1. **Enter Names**: Paste a list of names in any format:
+
    - Email format: `Dupont, Marie /FR/EXT <Marie.Dupont@example.com>`
    - Simple format: `John Doe` or just `John`
    - Separate multiple names with semicolons or newlines
