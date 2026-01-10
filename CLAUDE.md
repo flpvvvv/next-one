@@ -56,7 +56,7 @@ The `parseNames.ts` utility handles multiple formats:
 
 ### Wheel Mechanics
 
-- Names are randomly shuffled once at game start
+- Names are randomly shuffled once at game start (the shuffled order is persisted for the whole game)
 - Picked names are **removed** from the wheel (not grayed out)
 - Remaining names keep their relative order
 - Wheel rotation is calculated to land **exactly** on the predetermined winner

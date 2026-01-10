@@ -44,7 +44,9 @@ export default function Home() {
   };
 
   const handleStartGame = () => {
-    setShuffledOrder(shuffleArray(people.map(p => p.id)));
+    const shuffledPeople = shuffleArray(people);
+    setPeople(shuffledPeople);
+    setShuffledOrder(shuffledPeople.map(p => p.id));
     setPhase('game');
   };
 
