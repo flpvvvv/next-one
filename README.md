@@ -14,7 +14,7 @@ A fun, interactive web app for randomly picking names with a Wheel of Fortune st
 
 ## Demo
 
-Visit: [https://next-one.vercel.app/](https://next-one.vercel.app/)
+Visit: [https://whosnextone.vercel.app/](https://whosnextone.vercel.app/)
 
 ## How to Use
 
