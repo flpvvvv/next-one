@@ -22,11 +22,10 @@ function hashStringToSeed(input: string): number {
 interface GameArenaProps {
   initialPeople: Person[];
   shuffledOrder: string[];
-  onNewGame: () => void;
   soundEnabled: boolean;
 }
 
-export default function GameArena({ initialPeople, shuffledOrder, onNewGame, soundEnabled }: GameArenaProps) {
+export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }: GameArenaProps) {
   const [people, setPeople] = useState<Person[]>(initialPeople);
   const [pickedOrder, setPickedOrder] = useState<Person[]>([]);
   const [phase, setPhase] = useState<GamePhase>('playing');
@@ -257,7 +256,6 @@ export default function GameArena({ initialPeople, shuffledOrder, onNewGame, sou
           pickedOrder={pickedOrder}
           remaining={remainingCount}
           onRestartRound={handleRestartRound}
-          onNewGame={onNewGame}
         />
       </div>
 

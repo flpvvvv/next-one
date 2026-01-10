@@ -162,7 +162,6 @@ export default function Home() {
               <GameArena
                 initialPeople={people}
                 shuffledOrder={shuffledOrder}
-                onNewGame={handleNewGame}
                 soundEnabled={soundEnabled}
               />
             </motion.div>
