@@ -6,6 +6,8 @@ A fun, interactive web app for randomly picking names with a Wheel of Fortune st
 
 - **Smart Name Parsing**: Paste email-style contact lists or simple names - the app intelligently extracts names
 - **Wheel of Fortune Style**: Colorful spinning wheel with segments for each name
+- **Audio Feedback**: Realistic ticking sound during the spin and a celebration chime for the winner (toggleable)
+- **Winner Spotlight**: A full-screen modal announcement celebrates the picked person - giving them the stage for the daily stand-up
 - **Randomized Wheel Order**: Each time you start a game, names are shuffled on the wheel once (order stays fixed for the rest of the game)
 - **Dramatic Spin Animation**: 5-8 full rotations with realistic slowdown - the wheel always lands exactly on the announced winner
 - **Optional Sound**: A small jackpot sting you can toggle on/off

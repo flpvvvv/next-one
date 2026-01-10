@@ -50,16 +50,17 @@ The `parseNames.ts` utility handles multiple formats:
 1. **Input Phase**: Enter names in textarea
 2. **List Phase**: Review and edit names (add/remove)
 3. **Game Phase**: Wheel displayed with name segments
-4. **Spin Phase**: Wheel spins with dramatic slowdown
-5. **Winner Phase**: Banner shows winner (wheel stays visible at final position)
-6. **Repeat** until all names picked
+4. **Spin Phase**: Wheel spins with dramatic slowdown and **ticking sound**
+5. **Winner Phase**: **Full-screen Spotlight Modal** shows winner with confetti
+6. **Repeat** until all names picked (last person gets a spotlight too!)
 
 ### Wheel Mechanics
 
 - Names are randomly shuffled once at game start (the shuffled order is persisted for the whole game)
-- Picked names are **removed** from the wheel (not grayed out)
+- Picked names are **filtered out** from the wheel
 - Remaining names keep their relative order
 - Wheel rotation is calculated to land **exactly** on the predetermined winner
+- **Audio**: Tick sounds triggered at segment boundaries during spin
 - Text orientation: radial (pointing outward), flipped on left side for readability
 
 ### Animation Details

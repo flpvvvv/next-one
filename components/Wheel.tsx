@@ -1,8 +1,9 @@
 'use client';
 
-import { forwardRef, useImperativeHandle, useState, useCallback } from 'react';
+import { forwardRef, useImperativeHandle, useState, useCallback, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Person } from '@/types';
+import { playTick } from '@/lib/sound';
 
 // Vibrant segment colors
 const SEGMENT_COLORS = [
@@ -26,6 +27,7 @@ const SEGMENT_COLORS = [
 interface WheelProps {
   people: Person[];
   shuffledOrder: string[];
+  soundEnabled: boolean;
   onSpinEnd: (winner: Person) => void;
   includePickedPersonId?: string;
   highlightedPersonId?: string;
@@ -37,9 +39,10 @@ export interface WheelHandle {
 }
 
 const Wheel = forwardRef<WheelHandle, WheelProps>(
-  ({ people, shuffledOrder, onSpinEnd, includePickedPersonId, highlightedPersonId }, ref) => {
+  ({ people, shuffledOrder, soundEnabled, onSpinEnd, includePickedPersonId, highlightedPersonId }, ref) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
+  const lastTickRef = useRef<number>(0);
   const controls = useAnimation();
 
   // Get active (not picked) people in shuffled order
@@ -52,6 +55,19 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(
     );
 
   const segmentAngle = activePeople.length > 0 ? 360 / activePeople.length : 360;
+
+  const handleTick = useCallback((currentRotation: number) => {
+    // Tick every time we cross a segment boundary
+    // We adjust by segmentAngle/2 because the pointer is at the center of the top
+    const tickIndex = Math.floor((currentRotation + segmentAngle / 2) / segmentAngle);
+    
+    if (tickIndex !== lastTickRef.current) {
+      if (soundEnabled) {
+        void playTick();
+      }
+      lastTickRef.current = tickIndex;
+    }
+  }, [segmentAngle, soundEnabled]);
 
   const spin = useCallback(async () => {
     if (isSpinning || activePeople.length === 0) return;
@@ -225,6 +241,11 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(
         <motion.div
           animate={controls}
           initial={{ rotate: rotation }}
+          onUpdate={(latest) => {
+             if (typeof latest.rotate === 'number') {
+                handleTick(latest.rotate);
+             }
+          }}
           className="relative"
           style={{ width: wheelSize, height: wheelSize }}
         >

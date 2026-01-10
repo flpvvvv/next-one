@@ -19,6 +19,16 @@ function hashStringToSeed(input: string): number {
   return hash >>> 0;
 }
 
+// Fisher-Yates shuffle
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 interface GameArenaProps {
   initialPeople: Person[];
   shuffledOrder: string[];
@@ -27,6 +37,7 @@ interface GameArenaProps {
 
 export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }: GameArenaProps) {
   const [people, setPeople] = useState<Person[]>(initialPeople);
+  const [currentShuffledOrder, setCurrentShuffledOrder] = useState<string[]>(shuffledOrder);
   const [pickedOrder, setPickedOrder] = useState<Person[]>([]);
   const [phase, setPhase] = useState<GamePhase>('playing');
   const [currentWinner, setCurrentWinner] = useState<Person | null>(null);
@@ -102,7 +113,14 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
   };
 
   const handleRestartRound = () => {
-    setPeople(initialPeople.map(p => ({ ...p, picked: false })));
+    // Reset people state first
+    const resetPeople = initialPeople.map(p => ({ ...p, picked: false }));
+    
+    // Shuffle the reset list purely for the order IDs (the Wheel uses IDs for order)
+    const newShuffledPeople = shuffleArray(resetPeople);
+    
+    setPeople(resetPeople);
+    setCurrentShuffledOrder(newShuffledPeople.map(p => p.id));
     setPickedOrder([]);
     setPhase('playing');
     setCurrentWinner(null);
@@ -113,104 +131,17 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
     <div className="flex gap-6 w-full max-w-6xl mx-auto">
       {/* Main arena */}
       <div className="flex-1">
-        <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10">
+        <div className="bg-whitcurrentS/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10">
           {/* Wheel container */}
           <div className="flex flex-col items-center">
             <div className="relative mb-6">
               <Wheel
                 ref={wheelRef}
                 people={people}
-                shuffledOrder={shuffledOrder}
-                onSpinEnd={handleSpinEnd}
+                shuffledOrder={shuffledOrder}                soundEnabled={soundEnabled}                onSpinEnd={handleSpinEnd}
                 includePickedPersonId={phase === 'winner' && currentWinner ? currentWinner.id : undefined}
                 highlightedPersonId={phase === 'winner' && currentWinner ? currentWinner.id : undefined}
               />
-
-              {/* Winner banner - centered on wheel but transparent background */}
-              <AnimatePresence>
-                {phase === 'winner' && currentWinner && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none"
-                  >
-                    <motion.div
-                      initial={{ y: 30, boxShadow: '0 0 40px rgba(255, 200, 0, 0.6)' }}
-                      animate={{
-                        y: 0,
-                        scale: [1, 1.06, 1],
-                        boxShadow: [
-                          '0 0 40px rgba(255, 200, 0, 0.6)',
-                          '0 0 90px rgba(255, 200, 0, 1)',
-                          '0 0 40px rgba(255, 200, 0, 0.6)',
-                        ],
-                      }}
-                      transition={{ duration: 0.85, repeat: Infinity, repeatDelay: 0.15 }}
-                      className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500
-                                 px-8 py-5 rounded-2xl shadow-2xl text-center pointer-events-auto
-                                 relative overflow-hidden"
-                    >
-                      {/* One-shot jackpot flash (runs once on mount) */}
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: [0, 1, 0], scale: [0.9, 1.08, 1] }}
-                        transition={{ duration: 0.38, times: [0, 0.35, 1], ease: 'easeOut' }}
-                        className="absolute inset-0"
-                        style={{
-                          background:
-                            'radial-gradient(circle at 50% 35%, rgba(255,255,255,0.95), rgba(255,255,255,0) 60%)',
-                          mixBlendMode: 'overlay',
-                        }}
-                      />
-
-                      <motion.div
-                        animate={{ rotate: [0, -12, 12, -12, 12, 0], scale: [1, 1.1, 1] }}
-                        transition={{ duration: 0.55, delay: 0.15 }}
-                        className="text-5xl mb-2"
-                      >
-                        🎰
-                      </motion.div>
-                      <h2 className="text-2xl font-black text-white mb-1">WINNER!</h2>
-                      <p className="text-xl font-bold text-white/90">{currentWinner.name}</p>
-                      <p className="text-sm text-white/60 mt-1">#{pickedOrder.length} picked</p>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Finished overlay - only show when ALL done */}
-              <AnimatePresence>
-                {phase === 'finished' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-full z-30"
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="text-center"
-                    >
-                      <div className="text-7xl mb-4">🏆</div>
-                      <h2 className="text-3xl font-black text-white mb-4">All Done!</h2>
-                      <p className="text-lg text-white/70 mb-6">
-                        Everyone has been picked!
-                      </p>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleRestartRound}
-                        className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500
-                                   rounded-xl font-bold text-lg text-white shadow-lg"
-                      >
-                        🔄 Play Again
-                      </motion.button>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
 
 
@@ -231,20 +162,6 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
                   isSpinning={true}
                 />
               )}
-
-              {phase === 'winner' && (
-                <motion.button
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleNextRound}
-                  className="px-12 py-5 bg-gradient-to-r from-green-500 to-teal-500
-                             rounded-2xl font-black text-2xl text-white shadow-2xl"
-                >
-                  {remainingCount > 1 ? '→ Next Round' : '🏆 See Results'}
-                </motion.button>
-              )}
             </div>
           </div>
         </div>
@@ -261,6 +178,166 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
 
       {/* Confetti */}
       <Confetti active={showConfetti} seed={confettiSeed} />
+
+      {/* Winner Spotlight Modal */}
+      <AnimatePresence>
+        {phase === 'winner' && currentWinner && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.5, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-2xl w-full mx-auto"
+            >
+              <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-8 text-center text-white relative overflow-hidden">
+                {/* Background animated circles */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 90, 0],
+                  }}
+                  transition={{ duration: 10, repeat: Infinity }}
+                  className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-2xl"
+                />
+                <motion.div
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    rotate: [0, -45, 0],
+                  }}
+                  transition={{ duration: 15, repeat: Infinity }}
+                  className="absolute -bottom-20 -left-20 w-64 h-64 bg-white/10 rounded-full blur-2xl"
+                />
+
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", bounce: 0.5 }}
+                  className="text-8xl mb-4"
+                >
+                  🎉
+                </motion.div>
+                
+                <h2 className="text-3xl font-bold opacity-90 mb-2">The Winner is</h2>
+                <h1 className="text-6xl font-black mb-4 drop-shadow-md break-words">
+                  {currentWinner.name}
+                </h1>
+                
+                <div className="inline-block px-4 py-2 bg-white/20 rounded-full backdrop-blur-md">
+                  <span className="font-semibold">#{pickedOrder.length}</span> picked
+                </div>
+              </div>
+
+              <div className="p-8 bg-gray-50 flex flex-col gap-4">
+                <p className="text-center text-gray-500 text-lg">
+                  {remainingCount > 0 
+                    ? `${remainingCount} ${remainingCount === 1 ? 'person' : 'people'} left in the list.` 
+                    : "That was the last one!"}
+                </p>
+
+                <div className="flex justify-center">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleNextRound}
+                    autoFocus
+                    className="w-full max-w-sm py-4 bg-gradient-to-r from-green-500 to-emerald-600
+                               text-white text-2xl font-bold rounded-xl shadow-xl hover:shadow-2xl
+                               transition-all transform hover:-translate-y-1"
+                  >
+                    {remainingCount > 0 ? "Next Round →" : "See Final Results 🏆"}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Finished Modal */}
+      <AnimatePresence>
+        {phase === 'finished' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-3xl p-12 text-center max-w-2xl w-full relative overflow-hidden flex flex-col max-h-[85vh]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 pointer-events-none" />
+              
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="flex-shrink-0">
+                  <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-7xl mb-4"
+                  >
+                    🏆
+                  </motion.div>
+                  
+                  <motion.h2 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-300 to-red-300 mb-6"
+                  >
+                    All Done!
+                  </motion.h2>
+                </div>
+                
+                <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex-1 min-h-0 mb-8 flex flex-col"
+                >
+                   <div className="bg-white/5 rounded-2xl p-1 overflow-y-auto border border-white/10 flex-1 min-h-0 custom-scrollbar">
+                    {pickedOrder.map((p, i) => (
+                       <motion.div 
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5 + (i * 0.05) }}
+                          key={p.id} 
+                          className="flex items-center gap-4 p-3 border-b border-white/5 last:border-0 text-left hover:bg-white/5 transition-colors"
+                       >
+                          <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full text-sm font-bold text-white shadow-lg">
+                            {i + 1}
+                          </span>
+                          <span className="text-lg font-medium text-white/90 truncate">{p.name}</span>
+                       </motion.div>
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-500 mt-4 flex-shrink-0">Hope you had a great stand-up!</p>
+                </motion.div>
+                
+                <div className="flex-shrink-0">
+                  <motion.button
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleRestartRound}
+                    className="px-8 py-4 bg-white text-black rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg shadow-white/10"
+                  >
+                    Start Fresh 🔄
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

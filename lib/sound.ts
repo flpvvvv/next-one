@@ -68,3 +68,28 @@ export async function playJackpotSting(): Promise<void> {
     osc.stop(now + startOffsets[i] + 0.28);
   }
 }
+
+export async function playTick(): Promise<void> {
+  const ctx = getAudioContext();
+  if (!ctx || ctx.state === 'suspended') return; // Don't force resume for ticks, only for user actions if possible
+
+  const now = ctx.currentTime;
+  
+  // Create a short, crisp tick sound (filtered noise or high-pitch blip)
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  // High pitch, short decay for a "plastic clicker" sound
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(800, now);
+  osc.frequency.exponentialRampToValueAtTime(300, now + 0.03);
+
+  gain.gain.setValueAtTime(0.05, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.04);
+}
