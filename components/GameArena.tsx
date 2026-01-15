@@ -250,7 +250,7 @@ export default function GameArena({ initialPeople, shuffledOrder, soundEnabled }
                     autoFocus
                     className="w-full max-w-sm py-3 md:py-4 bg-gradient-to-r from-green-500 to-emerald-600
                                text-white text-lg md:text-2xl font-bold rounded-xl shadow-xl hover:shadow-2xl
-                               transition-all transform hover:-translate-y-1"
+                               transition-all"
                   >
                     {remainingCount > 0 ? "Next Round →" : "See Final Results 🏆"}
                   </motion.button>

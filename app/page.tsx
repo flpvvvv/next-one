@@ -180,12 +180,6 @@ export default function Home() {
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-4 text-center">
-        <p className="text-white/40 text-sm">
-          Made with ❤️ for fun team meetings (by FLP)
-        </p>
-      </footer>
     </div>
   );
 }
