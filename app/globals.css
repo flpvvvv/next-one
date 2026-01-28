@@ -95,6 +95,26 @@ body {
   }
 }
 
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Touch interaction improvements */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Modal overlay behavior */
+.modal-overlay {
+  overscroll-behavior: contain;
+}
+
 nextjs-portal {
   left: auto !important;
   top: auto !important;

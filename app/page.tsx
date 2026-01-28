@@ -86,7 +86,7 @@ export default function Home() {
             className="text-xl md:text-3xl font-black text-white flex items-center gap-2 md:gap-3"
           >
             <Image src="/logo.svg" alt="Who's next?" width={40} height={40} className="w-8 h-8 md:w-10 md:h-10" />
-            <span className="hidden sm:inline">Who's next?</span>
+            <span className="hidden sm:inline">Who&apos;s next?</span>
             <span className="sm:hidden">Next?</span>
           </motion.h1>
 
@@ -105,12 +105,14 @@ export default function Home() {
                   }
                 }}
                 aria-pressed={soundEnabled}
+                aria-label={soundEnabled ? 'Turn sound off' : 'Turn sound on'}
                 className="px-2 py-1.5 md:px-3 md:py-2 bg-white/10 hover:bg-white/20 rounded-lg
-                           text-white text-xs md:text-sm font-medium transition-colors"
+                           text-white text-xs md:text-sm font-medium transition-colors
+                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
                 title={soundEnabled ? 'Sound on' : 'Sound off'}
               >
                 <span className="hidden sm:inline">{soundEnabled ? '🔊 Sound' : '🔇 Sound'}</span>
-                <span className="sm:hidden">{soundEnabled ? '🔊' : '🔇'}</span>
+                <span className="sm:hidden" aria-hidden="true">{soundEnabled ? '🔊' : '🔇'}</span>
               </motion.button>
 
               <motion.button
@@ -119,11 +121,13 @@ export default function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleNewGame}
+                aria-label="Start new game"
                 className="px-2 py-1.5 md:px-4 md:py-2 bg-white/10 hover:bg-white/20 rounded-lg
-                           text-white text-xs md:text-sm font-medium transition-colors"
+                           text-white text-xs md:text-sm font-medium transition-colors
+                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
               >
                 <span className="hidden sm:inline">🆕 New Game</span>
-                <span className="sm:hidden">🆕</span>
+                <span className="sm:hidden" aria-hidden="true">🆕</span>
               </motion.button>
             </div>
           )}

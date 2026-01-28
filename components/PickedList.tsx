@@ -17,7 +17,7 @@ export default function PickedList({
   return (
     <div className="bg-white/10 backdrop-blur-lg rounded-xl md:rounded-2xl p-3 md:p-4 border border-white/20 h-full flex flex-col">
       <h3 className="text-base md:text-lg font-bold text-white mb-2 md:mb-3 flex items-center gap-2">
-        <span>📋</span>
+        <span aria-hidden="true">📋</span>
         Pick Order
       </h3>
 
@@ -37,13 +37,13 @@ export default function PickedList({
                 {index + 1}
               </span>
               <span className="text-white text-sm truncate">{person.name}</span>
-              <span className="ml-auto text-green-400">✓</span>
+              <span className="ml-auto text-green-400" aria-hidden="true">✓</span>
             </motion.div>
           ))}
         </AnimatePresence>
 
         {pickedOrder.length === 0 && (
-          <p className="text-white/40 text-sm text-center py-4">
+          <p className="text-white/40 text-sm text-center py-4" aria-live="polite">
             No one picked yet.<br />
             Click SPIN to start!
           </p>
@@ -68,11 +68,13 @@ export default function PickedList({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onRestartRound}
+          aria-label="Restart round and reset all picks"
           className="w-full py-1.5 md:py-2 px-3 md:px-4 bg-white/10 hover:bg-white/20
                      rounded-lg text-white text-xs md:text-sm font-medium
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500
                      transition-colors duration-200"
         >
-          🔄 Restart Round
+          <span aria-hidden="true">🔄</span> Restart Round
         </motion.button>
       </div>
     </div>

@@ -12,8 +12,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
+      <head>
+        <meta name="theme-color" content="#1a1a2e" />
+      </head>
+      <body className="antialiased touch-manipulation">
         {children}
       </body>
     </html>

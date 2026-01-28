@@ -33,7 +33,7 @@ export default function NameInput({ onNamesSubmit }: NameInputProps) {
     >
       <div className="bg-white/10 backdrop-blur-lg rounded-xl md:rounded-2xl p-4 md:p-6 shadow-2xl border border-white/20">
         <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4 flex items-center gap-2">
-          <span className="text-2xl md:text-3xl">📝</span>
+          <span className="text-2xl md:text-3xl" aria-hidden="true">📝</span>
           Enter Names
         </h2>
 
@@ -49,15 +49,16 @@ export default function NameInput({ onNamesSubmit }: NameInputProps) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Example:
+          aria-label="Names list input"
+          placeholder="Example…
 Dupont, Marie /FR/EXT <Marie.Dupont@example.com>; Martin, Lucas /FR <Lucas.Martin@example.com>
 
-Or simply:
+Or simply…
 Alice Johnson; Bob Smith; Carol Williams"
           className="w-full h-40 md:h-48 px-3 md:px-4 py-2 md:py-3 rounded-lg md:rounded-xl bg-white/5 border border-white/10
                      text-white placeholder-white/30 resize-none text-sm md:text-base
-                     focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50
-                     transition-all duration-200"
+                     focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/50 focus-visible:border-pink-500/50
+                     transition-colors duration-200"
         />
 
         <div className="mt-3 md:mt-4 flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
@@ -74,7 +75,8 @@ Alice Johnson; Bob Smith; Carol Williams"
                        rounded-lg md:rounded-xl font-bold text-white shadow-lg text-sm md:text-base
                        hover:shadow-pink-500/25 hover:shadow-xl
                        disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-all duration-200"
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pink-500
+                       transition-colors duration-200"
           >
             Parse Names →
           </motion.button>

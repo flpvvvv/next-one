@@ -59,7 +59,7 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
       <div className="bg-white/10 backdrop-blur-lg rounded-xl md:rounded-2xl p-4 md:p-6 shadow-2xl border border-white/20">
         <div className="flex justify-between items-center mb-3 md:mb-4">
           <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
-            <span className="text-2xl md:text-3xl">👥</span>
+            <span className="text-2xl md:text-3xl" aria-hidden="true">👥</span>
             <span className="hidden sm:inline">Name List</span>
             <span className="sm:hidden">Names</span>
             <span className="text-sm md:text-lg font-normal text-white/60">
@@ -71,7 +71,9 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onBack}
-            className="px-3 md:px-4 py-1.5 md:py-2 text-white/70 hover:text-white transition-colors text-sm md:text-base"
+            aria-label="Go back to input"
+            className="px-3 md:px-4 py-1.5 md:py-2 text-white/70 hover:text-white transition-colors text-sm md:text-base
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded-lg"
           >
             ← Back
           </motion.button>
@@ -84,20 +86,24 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Add a name..."
-            className="flex-1 px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl bg-white/5 border border-white/10
+            placeholder="Add a name…"
+            aria-label="Add a new name"
+            autoComplete="off"
+            className="flex-1 min-w-0 px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl bg-white/5 border border-white/10
                        text-white placeholder-white/30 text-sm md:text-base
-                       focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500/50
-                       transition-all duration-200"
+                       focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50 focus-visible:border-teal-500/50
+                       transition-colors duration-200"
           />
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleAdd}
             disabled={!newName.trim() || atMax}
+            aria-label="Add name to list"
             className="px-3 md:px-4 py-1.5 md:py-2 bg-teal-500 rounded-lg md:rounded-xl font-bold text-white text-sm md:text-base
                        disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-all duration-200"
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-teal-500
+                       transition-colors duration-200"
           >
             + Add
           </motion.button>
@@ -127,11 +133,13 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => handleRemove(person.id)}
+                  aria-label={`Remove ${person.name}`}
                   className="opacity-100 md:opacity-0 group-hover:opacity-100 p-1.5 md:p-2 text-red-400
                              hover:text-red-300 hover:bg-red-500/20 rounded-lg
-                             transition-all duration-200"
+                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400
+                             transition-colors duration-200"
                 >
-                  ✕
+                  <span aria-hidden="true">✕</span>
                 </motion.button>
               </motion.div>
             ))}
@@ -143,9 +151,11 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            role="alert"
+            aria-live="polite"
             className="text-amber-400 text-xs md:text-sm mb-3 md:mb-4"
           >
-            ⚠️ {validation.message}
+            <span aria-hidden="true">⚠️</span> {validation.message}
           </motion.p>
         )}
 
@@ -169,9 +179,10 @@ export default function NameList({ people, onUpdate, onStartGame, onBack }: Name
                      rounded-lg md:rounded-xl font-bold text-lg md:text-xl text-white shadow-lg
                      hover:shadow-green-500/25 hover:shadow-xl
                      disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-all duration-200"
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-500
+                     transition-colors duration-200"
         >
-          🎲 Start Game!
+          <span aria-hidden="true">🎲</span> Start Game!
         </motion.button>
       </div>
     </motion.div>
